@@ -145,6 +145,33 @@ void init(double** arr, int n, int m, int num)
 	arr[3][4] = -8.35;
 }
 
+void initD(double** arr, int n, int m)
+{
+	arr[0][0] = 1;
+	arr[0][1] = 0.17;
+	arr[0][2] = 0.27;
+	arr[0][3] = 0.18;
+	arr[0][4] = -1.79;
+
+	arr[1][0] = 0;
+	arr[1][1] = 1;
+	arr[1][2] = 0.67;
+	arr[1][3] = 0.25;
+	arr[1][4] = 0.99;
+
+	arr[2][0] = 0;
+	arr[2][1] = 0;
+	arr[2][2] = 1;
+	arr[2][3] = -0.17;
+	arr[2][4] = 6.67;
+
+	arr[3][0] = 0;
+	arr[3][1] = 0;
+	arr[3][2] = -0.18;
+	arr[3][3] = 1;
+	arr[3][4] = -1.74;
+}
+
 double** createArr(int n, int m)
 {
 	double** arr = new double* [n];
@@ -153,118 +180,6 @@ double** createArr(int n, int m)
 		*(arr + i) = new double[m];
 	}
 	return arr;
-}
-
-void swapCols(double** arr, int length, int col1, int col2)
-{
-	int temp;
-	for (int i = 0; i < length; i++)
-	{
-		temp = arr[i][col1];
-		arr[i][col1] = arr[i][col2];
-		arr[i][col2] = temp;
-	}
-}
-
-void forwMove(double** arr, int n, int m)
-{
-	for (int i = 0; i < n - 2; i++)
-	{
-		if (arr[i][i] == 0)
-		{
-			int temp = -1;
-
-			bool zeroRow = true;
-
-			for (int t = i + 1; t < m - 1; t++)
-			{
-				if (arr[i][t] != 0)
-				{
-					zeroRow = false;
-					temp = t;
-					t = n - 1;
-				}
-				else
-				{
-					zeroRow = true;
-				}
-			}
-
-			if (!zeroRow)
-			{
-				swapCols(arr, n, i, temp);
-				i--;
-			}
-			else
-			{
-				if (arr[i][m - 1] == 0)
-				{
-					cout << "System has many solutions" << endl;
-				}
-				else
-				{
-					cout << "System doesn't have a solution" << endl;
-				}
-
-				i = m;
-				return;
-			}
-		}
-		else
-		{
-			double coef1 = arr[i][i];
-			arr[i][i] = 1;
-			for (int k = i + 1; k < m; k++)
-			{
-				arr[i][k] /= coef1;
-			}
-
-			for (int j = i; j < n - 1; j++)
-			{
-				double coef2 = -arr[j + 1][i];
-				arr[j + 1][i] = 0;
-				
-				for (int k = i + 1; k < m; k++)
-				{
-					arr[j + 1][k] += (arr[i][k] * coef2);
-				}
-			}
-		}
-	}
-}
-
-//ітераційний закон
-void iterationLaw(double** arr, int n, int m)
-{
-	//приведення до діагональної переваги
-	forwMove(arr, n, m);
-
-	for(int i = 0; i < n; i++)
-	{
-		double sum = 0;
-		double coef1 = arr[i][i];
-		
-		for(int j = 0; j < m; j++)
-		{
-			arr[i][j] /= coef1;
-			if(i != j)
-			{
-				sum += abs(arr[i][j]);
-			}
-		}
-		
-		if(sum > 1)
-		{
-			double coef = 0.99 / sum;
-			for(int k = i + 1; k < m; k++)
-			{
-				double m = -arr[i][k] * coef;
-				arr[i][k] += m;
-			}
-		}		
-	}
-	
-	table(arr, n, m, P);
 }
 
 //ітерації
@@ -349,8 +264,8 @@ bool diagonalDominating(double** a, int size)
 void zeidel(double** arr, int n, int m, double* res, double eps = E)
 {
 	cout << "Iteration law\n";
-	iterationLaw(arr, n, m);
-
+	table(arr, N, M, P);
+	
 	for(int i = 0; i < n; i++)
 	{
 		res[i] = arr[i][m - 1];
@@ -372,15 +287,15 @@ void zeidel(double** arr, int n, int m, double* res, double eps = E)
 int main()
 {
 	double** arr = createArr(N, M);
-	init(arr, N, M, 15);
-
-	cout << "Original matrix" << endl;
-	table(arr, N, M, P);
-	cout << endl;
-
+	initD(arr, N, M);	
+	
 	//зберегли вихідну систему для обчислення вектора нев'язки
 	origin = createArr(N, M);
 	init(origin, N, M, 15);
+
+	cout << "Original matrix" << endl;
+	table(origin, N, M, P);
+	cout << endl;
 
 	double* solution = new double[N];
 	zeidel(arr, N, M, solution);
